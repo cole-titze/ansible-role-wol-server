@@ -1,0 +1,19 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: raspberry-pi
+  author: cole-titze
+  description: Configures a Raspberry Pi.
+  license: "license (MIT)"
+  min_ansible_version: 2.10
+  platforms:
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - system
+    - raspberry
+    - pi
+    - raspbian
+    - wol

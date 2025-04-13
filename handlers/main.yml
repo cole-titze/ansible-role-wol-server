@@ -1,0 +1,6 @@
+---
+handlers:
+- name: Restart WoL-Web
+  systemd:
+    name: wol-web
+    state: restarted

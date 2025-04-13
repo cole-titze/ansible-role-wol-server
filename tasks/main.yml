@@ -1,0 +1,61 @@
+---
+- name: Set variables
+  set_fact:
+    wol_web_repo: "https://github.com/ms7m/wol-web.git"
+    wol_web_directory: "/home/pi/wol-web"
+    nodejs_version: "18.x"
+
+- name: Install prerequisites
+  apt:
+    name: [curl, git]
+    state: present
+    update_cache: yes
+
+- name: Add NodeSource APT repository
+  shell: "curl -fsSL https://deb.nodesource.com/setup_{{ nodejs_version }} | bash -"
+  args:
+    executable: /bin/bash
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+
+- name: Clone WoL-Web repository
+  git:
+    repo: "{{ wol_web_repo }}"
+    dest: "{{ wol_web_directory }}"
+    update: yes
+    force: yes
+  become_user: pi
+
+- name: Install npm dependencies
+  npm:
+    path: "{{ wol_web_directory }}"
+  become_user: pi
+
+- name: Create systemd service for WoL-Web
+  copy:
+    dest: /etc/systemd/system/wol-web.service
+    content: |
+      [Unit]
+      Description=WoL-Web service
+      After=network.target
+
+      [Service]
+      WorkingDirectory={{ wol_web_directory }}
+      ExecStart=/usr/bin/npm start
+      Restart=always
+      User=pi
+      Environment=PATH=/usr/bin:/usr/local/bin
+      Environment=NODE_ENV=production
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Restart WoL-Web
+
+- name: Enable and start WoL-Web service
+  systemd:
+    name: wol-web
+    enabled: yes
+    state: started
