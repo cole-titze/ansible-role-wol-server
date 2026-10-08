@@ -1,6 +1,6 @@
 ---
-handlers:
 - name: Restart WoL-Web
-  systemd:
+  ansible.builtin.systemd:
     name: wol-web
     state: restarted
+    daemon_reload: true
